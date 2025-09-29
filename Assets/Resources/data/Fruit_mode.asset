@@ -14,38 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   list_fruit:
   - type: 1
-    max_lv: 10
-    sprite: {fileID: 21300000, guid: 232a221759b248e4e893e1ebdbbdd07b, type: 3}
-    radius: 0
+    sprite: {fileID: 21300000, guid: 601aa5b2327f82649855baa7a013fae5, type: 3}
+    add_size: 0
     score: 10
     color: {r: 0, g: 0, b: 0, a: 0}
   - type: 2
-    max_lv: 10
-    sprite: {fileID: 21300000, guid: 641a09213bfc0a245bb11077542c3a33, type: 3}
-    radius: 0
+    sprite: {fileID: 21300000, guid: 232a221759b248e4e893e1ebdbbdd07b, type: 3}
+    add_size: 1
     score: 10
     color: {r: 0, g: 0, b: 0, a: 0}
   - type: 3
-    max_lv: 10
     sprite: {fileID: 21300000, guid: a8699601fa98c6a4c89cbb370dff5836, type: 3}
-    radius: 0
+    add_size: 2
     score: 10
     color: {r: 0, g: 0, b: 0, a: 0}
   - type: 4
-    max_lv: 10
-    sprite: {fileID: 21300000, guid: 2013173c2a6c7274286eabef46cead94, type: 3}
-    radius: 0
+    sprite: {fileID: 21300000, guid: 641a09213bfc0a245bb11077542c3a33, type: 3}
+    add_size: 3
     score: 10
     color: {r: 0, g: 0, b: 0, a: 0}
   - type: 5
-    max_lv: 10
-    sprite: {fileID: 21300000, guid: 601aa5b2327f82649855baa7a013fae5, type: 3}
-    radius: 0
+    sprite: {fileID: 21300000, guid: 2013173c2a6c7274286eabef46cead94, type: 3}
+    add_size: 4
     score: 10
     color: {r: 0, g: 0, b: 0, a: 0}
   - type: 6
-    max_lv: 10
     sprite: {fileID: 21300000, guid: 2e44357e6e223df4090cb032efcb048b, type: 3}
-    radius: 0
+    add_size: 5
     score: 10
     color: {r: 0, g: 0, b: 0, a: 0}

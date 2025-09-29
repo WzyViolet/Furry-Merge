@@ -7,49 +7,59 @@ public class RadialGravity : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        center = transform.Find("center").transform;
         list_fruit = new List<Fruit_controller>();
     }
     public List<Fruit_controller> list_fruit;
-    public float gravity = 2f;
-    public float outerBoundaryRadius = 2f;
-    private Transform center;
-
+    public float outerBoundaryRadius;
+    private void Start()
+    {
+        Bounds bounds = GetComponent<SpriteRenderer>().bounds;
+        outerBoundaryRadius = Mathf.Min(bounds.extents.x, bounds.extents.y);
+    }
     void FixedUpdate()
     {
         if (list_fruit.Count > 0)
         {
             foreach (Fruit_controller melon in list_fruit)
             {
-                if(melon!=null)
-                //ApplyRadialGravity(melon);
-                CheckOuterBoundary(melon);
+                if (melon != null)
+                {
+                    if (melon.shake)
+                    {
+                        ApplyRadialGravity(melon);
+                    }
+                    CheckOuterBoundary(melon);
+                }
             }
         }
     }
 
     void ApplyRadialGravity(Fruit_controller melon)
     {
+        melon.timer += Time.deltaTime;
+        if (melon.timer >= 0.3f)
+        {
+            melon.timer = 0;melon.shake = false;
+        }
         Rigidbody2D rb = melon.GetComponent<Rigidbody2D>();
-        Vector2 directionToCenter = ((Vector2)center.position  - (Vector2)melon.transform.position).normalized;
 
         // 向外施加重力（离心力）
-        rb.AddForce(directionToCenter * -gravity * rb.mass);
+        rb.AddForce(melon.dir*5);
     }
 
     void CheckOuterBoundary(Fruit_controller melon)
     {
-        float distanceFromCenter = Vector2.Distance((Vector2)center.position , melon.transform.position);
-
-        if (distanceFromCenter >= outerBoundaryRadius)
+        float distanceFromCenter = Vector2.Distance((Vector2)transform .position , melon.transform.position);
+        distanceFromCenter += melon.Get_radios;
+        if (distanceFromCenter > outerBoundaryRadius)
         {
             // 碰到外层圆，停止运动
             Rigidbody2D rb = melon.GetComponent<Rigidbody2D>();
             rb.velocity = Vector2.zero;
             rb.angularVelocity = 0f;
-            Vector2 dir =melon.transform.position-center.position ;
+            Vector2 dir =(melon.transform.position-transform .position).normalized ;
             // 确保西瓜不会超出边界
-            Vector2 clampedPosition = (dir).normalized * (outerBoundaryRadius - 0.01f);
+            Vector2 clampedPosition = dir * (outerBoundaryRadius-0.001f)-dir*melon.Get_radios;
             melon.transform.position = clampedPosition;
         }
     }

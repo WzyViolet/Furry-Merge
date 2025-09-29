@@ -10,9 +10,8 @@ public enum Fruittype
 public struct Fruit_data
 {
     public Fruittype type;
-    public int max_lv;
     public Sprite sprite;
-    public float radius;
+    public float add_size;
     public int score;
     public Color color;
 }

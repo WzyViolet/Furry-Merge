@@ -22,13 +22,13 @@ public class Uimanager : MonoBehaviour
         cur_txt = transform.Find("Top/Score/txt").GetComponent<Text>();
         total_txt = transform.Find("Top/HighScore/txt").GetComponent<TextMeshProUGUI>();
         img_score = transform.Find("Top/Score/img").GetComponent<Image>();
-        score = 0;Add_score(0);
+        score = 0;Add_scores(0);
         list_str = new List<string>()
         {
             "再接再厉!!!","加油!!!"
         };
     }
-    public void Add_score(int op)
+    public void Add_scores(int op)
     {
         score += op;
         if (score < 100)
