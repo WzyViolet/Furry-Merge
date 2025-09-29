@@ -1,21 +1,22 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-[System. Serializable]
+[System.Serializable]
 public class Fruit_curdata
 {
-    public Fruit_data data; public int cur_lv;
-    public Fruit_curdata(Fruit_data op, int lv)
+    public Fruit_data data; 
+    public Fruit_curdata(Fruit_data op)
     {
-        data = op; cur_lv = lv;
+        data = op;
     }
 }
 public class Controller : MonoBehaviour
 {
     [Header("水果数据配置")]
-    public Fruit_mode fruit_mode;
+    private Fruit_mode fruit_mode;
     private Dictionary<Fruittype, Fruit_data> dic_fruit = new Dictionary<Fruittype, Fruit_data>();
-    private Image img_next;private Fruit_curdata next_fruit;
+    private Image img_next; 
     [Header("游戏参数")]
     private List<Fruit_controller> list_cur = new List<Fruit_controller>();
     public float launchForce = 10f;        // 发射力度
@@ -29,6 +30,15 @@ public class Controller : MonoBehaviour
             return dic_fruit[type];
         return default;
     }
+    public bool Can_next(Fruittype type)
+    {
+        int op = (int)type; op++;
+        if (op > dic_fruit.Count)
+        {
+            return false;
+        }
+        return true;
+    }
     public Fruit_data Get_nexttype(Fruittype op)
     {
         int num = (int)op;
@@ -39,29 +49,39 @@ public class Controller : MonoBehaviour
         }
         return GetFruitData(op);
     }
-    [SerializeField] private GameObject watermelonPrefab;
-    [SerializeField] private Transform launchPoint;
-    [SerializeField] private LineRenderer trajectoryLine;
-
+    private GameObject watermelonPrefab;
+    public LineRenderer trajectoryLine;
+    private GameObject gam_temp;
     private Vector2 startTouchPos;
     private Vector2 currentTouchPos;
-    private bool isAiming = false;
+    private bool isAiming = false;private Fruit_data cur_fruit;private Fruit_data next_fruit;
+    private float gam_radios;
+    [HideInInspector] public  float radios;
     private void Start()
     {
+        trajectoryLine = GetComponent<LineRenderer>();
+        Bounds bounds = GetComponent<SpriteRenderer>().bounds;
+        radios = Mathf.Min(bounds.extents.x, bounds.extents.y);
         img_next = GameObject.Find("Canvas/Top/Next/img").GetComponent<Image>();
         fruit_mode = Resources.Load<Fruit_mode>("data/Fruit_mode");
-        launchPoint = transform.Find("center").transform;
         foreach (Fruit_data temp in fruit_mode.list_fruit)
         {
             dic_fruit[temp.type] = temp;
         }
         list_cur = new List<Fruit_controller>();
-        watermelonPrefab = Resources.Load<GameObject>("Prefab/Circle");
-        trajectoryLine = GetComponent<LineRenderer>();
+        watermelonPrefab = Resources.Load<GameObject>("prefab/gameobject/Circle");
+        gam_temp = Resources.Load<GameObject>("prefab/gameobject/temp");
+        //trajectoryLine = GetComponent<LineRenderer>();
+        gam_temp= Instantiate(gam_temp,transform .position ,Quaternion.identity);
+        gam_temp.SetActive(false);
+        gam_radios = gam_temp.GetComponent<SpriteRenderer>().bounds.extents.x;
+        next_fruit = GetFruitData((Fruittype)Random.Range(1, 3));
+        StartCoroutine(Create_fruit());
     }
 
     void Update()
     {
+        if(gam_temp.activeSelf)
         HandleTouchInput();
         DrawTrajectory();
     }
@@ -89,29 +109,37 @@ public class Controller : MonoBehaviour
         }
 
         // 鼠标输入（测试用）
-        if (Input.GetMouseButtonDown(0))
-        {
-            StartAiming(Input.mousePosition);
-        }
-        else if (Input.GetMouseButton(0))
-        {
-            UpdateAiming(Input.mousePosition);
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            LaunchWatermelon();
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    StartAiming(Input.mousePosition);
+        //}
+        //else if (Input.GetMouseButton(0))
+        //{
+        //    UpdateAiming(Input.mousePosition);
+        //}
+        //else if (Input.GetMouseButtonUp(0))
+        //{
+        //    LaunchWatermelon();
+        //}
     }
-
+    private void OnMouseDown()
+    {
+        StartAiming(Input.mousePosition);
+    }
+    private void OnMouseDrag()
+    {
+        UpdateAiming(Input.mousePosition);
+    }
+    private void OnMouseUp()
+    {
+        LaunchWatermelon();
+    }
     void StartAiming(Vector2 screenPos)
     {
         isAiming = true;
         startTouchPos = screenPos;
         trajectoryLine.enabled = true;
         Fruit_data op = GetFruitData((Fruittype)(Random.Range(0, dic_fruit.Count)));
-        next_fruit = new Fruit_curdata(op, Random.Range(0, 3));
-        Debug.Log("等级为" + next_fruit.cur_lv);
-        img_next.sprite = next_fruit.data.sprite;
     }
 
     void UpdateAiming(Vector2 screenPos)
@@ -119,7 +147,7 @@ public class Controller : MonoBehaviour
         if (!isAiming) return;
 
         currentTouchPos = screenPos;
-        launchDirection = (startTouchPos - currentTouchPos).normalized;
+        launchDirection = (currentTouchPos-startTouchPos).normalized;
     }
 
     void LaunchWatermelon()
@@ -129,32 +157,35 @@ public class Controller : MonoBehaviour
         // 计算发射力度（基于滑动距离）
         float swipeDistance = Vector2.Distance(startTouchPos, currentTouchPos);
         float force = Mathf.Clamp(swipeDistance * 0.01f, 1f, 10f);
-
-        GameObject newMelon = Instantiate(watermelonPrefab, launchPoint.position, Quaternion.identity);
+        gam_temp.SetActive(false);
+        GameObject newMelon = Instantiate(watermelonPrefab, transform .position, Quaternion.identity);
         Rigidbody2D rb = newMelon.GetComponent<Rigidbody2D>();
-        newMelon.GetComponent<Fruit_controller>().Initgam(next_fruit);
+        newMelon.GetComponent<Fruit_controller>().Initgam(new Fruit_curdata( cur_fruit));
         // 向外发射
         rb.AddForce(launchDirection * force * launchForce, ForceMode2D.Impulse);
-        RadialGravity.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
+        Gravit.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
         isAiming = false;
         trajectoryLine.enabled = false;
+        StartCoroutine(Create_fruit());
     }
-
+    private IEnumerator Create_fruit()
+    {
+        yield return new WaitForSeconds(0.1f);
+        cur_fruit = next_fruit;
+        next_fruit = GetFruitData((Fruittype)Random.Range(1, 3));
+        img_next.sprite = next_fruit.sprite;
+        gam_temp.SetActive(true);
+        gam_temp.transform.localScale = (1 + cur_fruit.add_size*0.5f)*new Vector3(0.05f,0.05f,0.05f);
+        gam_temp.GetComponent<SpriteRenderer>().sprite = cur_fruit.sprite;
+        gam_radios = gam_temp.GetComponent<SpriteRenderer>().bounds.extents.x;
+    }
     void DrawTrajectory()
     {
         if (!isAiming) return;
-
-        Vector3[] points = new Vector3[10];
-        Vector2 startPos = launchPoint.position;
-        Vector2 velocity = launchDirection * launchForce;
-
-        for (int i = 0; i < points.Length; i++)
-        {
-            float time = i * 0.1f;
-            points[i] = startPos + velocity * time + 0.5f * Physics2D.gravity * time * time;
-        }
-
-        trajectoryLine.positionCount = points.Length;
-        trajectoryLine.SetPositions(points);
+        Vector2 dir = (currentTouchPos - startTouchPos).normalized;
+        Vector2 pos = (Vector2)transform.position + dir * gam_radios;
+        trajectoryLine.SetPosition(0,new Vector3( pos.x,pos.y,-1));
+        dir *= radios;
+        trajectoryLine.SetPosition(1,new Vector3(dir.x,dir.y,-1));
     }
 }
