@@ -59,6 +59,7 @@ public class Controller : MonoBehaviour
     [HideInInspector] public  float radios;
     private void Start()
     {
+        trajectoryLine = GetComponent<LineRenderer>();
         Bounds bounds = GetComponent<SpriteRenderer>().bounds;
         radios = Mathf.Min(bounds.extents.x, bounds.extents.y);
         img_next = GameObject.Find("Canvas/Top/Next/img").GetComponent<Image>();
@@ -108,20 +109,31 @@ public class Controller : MonoBehaviour
         }
 
         // 鼠标输入（测试用）
-        if (Input.GetMouseButtonDown(0))
-        {
-            StartAiming(Input.mousePosition);
-        }
-        else if (Input.GetMouseButton(0))
-        {
-            UpdateAiming(Input.mousePosition);
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            LaunchWatermelon();
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    StartAiming(Input.mousePosition);
+        //}
+        //else if (Input.GetMouseButton(0))
+        //{
+        //    UpdateAiming(Input.mousePosition);
+        //}
+        //else if (Input.GetMouseButtonUp(0))
+        //{
+        //    LaunchWatermelon();
+        //}
     }
-
+    private void OnMouseDown()
+    {
+        StartAiming(Input.mousePosition);
+    }
+    private void OnMouseDrag()
+    {
+        UpdateAiming(Input.mousePosition);
+    }
+    private void OnMouseUp()
+    {
+        LaunchWatermelon();
+    }
     void StartAiming(Vector2 screenPos)
     {
         isAiming = true;
@@ -151,7 +163,7 @@ public class Controller : MonoBehaviour
         newMelon.GetComponent<Fruit_controller>().Initgam(new Fruit_curdata( cur_fruit));
         // 向外发射
         rb.AddForce(launchDirection * force * launchForce, ForceMode2D.Impulse);
-        RadialGravity.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
+        Gravit.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
         isAiming = false;
         trajectoryLine.enabled = false;
         StartCoroutine(Create_fruit());
@@ -165,6 +177,7 @@ public class Controller : MonoBehaviour
         gam_temp.SetActive(true);
         gam_temp.transform.localScale = (1 + cur_fruit.add_size*0.5f)*new Vector3(0.05f,0.05f,0.05f);
         gam_temp.GetComponent<SpriteRenderer>().sprite = cur_fruit.sprite;
+        gam_radios = gam_temp.GetComponent<SpriteRenderer>().bounds.extents.x;
     }
     void DrawTrajectory()
     {

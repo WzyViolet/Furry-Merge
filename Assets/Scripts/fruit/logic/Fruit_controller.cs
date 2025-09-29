@@ -32,6 +32,7 @@ public class Fruit_controller : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision == null) return;
         shake = true;rb.velocity = Vector2.zero;dir = (transform.position - controller.transform .position).normalized;
         Fruit_controller otherMelon = collision.gameObject.GetComponent<Fruit_controller>();
         Fruit_controller thisMelon = GetComponent<Fruit_controller>();
@@ -59,7 +60,8 @@ public class Fruit_controller : MonoBehaviour
                 Debug.Log("¿ªÊ¼ÈÚºÏ");
                 Fruit_data temp_data = controller.Get_nexttype(data.data.type);
                 Fruit_curdata temp = new Fruit_curdata(temp_data);
-                SpawnMergedWatermelon(mergePosition, temp);  
+                SpawnMergedWatermelon(mergePosition, temp);
+                Uimanager.Instance.Add_scores(data.data.score);
             }
             else
             {
@@ -77,7 +79,7 @@ public class Fruit_controller : MonoBehaviour
         GameObject newMelon = Instantiate(gam, position, Quaternion.identity);
         Fruit_controller watermelon = newMelon.GetComponent<Fruit_controller>();
         newMelon.GetComponent<Fruit_controller>().Initgam(data,true);
-        RadialGravity.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
+        Gravit.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
         newMelon.GetComponent<Fruit_controller>().shake = true;
     }
 }
