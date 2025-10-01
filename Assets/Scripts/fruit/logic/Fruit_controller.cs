@@ -10,6 +10,7 @@ public class Fruit_controller : MonoBehaviour
     public  Fruit_curdata data;private Controller controller;
     private float radios;//°ë¾¶
     [HideInInspector] public bool shake = false; [HideInInspector] public float timer;
+    [HideInInspector] public bool can_test=false;
     public float Get_radios { get { return radios; } }
     [HideInInspector] public Vector2 dir;
     public  void Initgam(Fruit_curdata op,bool shake=false)
@@ -32,7 +33,7 @@ public class Fruit_controller : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision == null) return;
+        if (collision == null) return;can_test = true;Debug.Log("¿ªÊ¼Åö×²");
         shake = true;rb.velocity = Vector2.zero;dir = (transform.position - controller.transform .position).normalized;
         Fruit_controller otherMelon = collision.gameObject.GetComponent<Fruit_controller>();
         Fruit_controller thisMelon = GetComponent<Fruit_controller>();
@@ -80,6 +81,7 @@ public class Fruit_controller : MonoBehaviour
         Fruit_controller watermelon = newMelon.GetComponent<Fruit_controller>();
         newMelon.GetComponent<Fruit_controller>().Initgam(data,true);
         Gravit.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
-        newMelon.GetComponent<Fruit_controller>().shake = true;
+        Vector2 dir = (transform.position - controller.transform.position).normalized;
+        newMelon.GetComponent<Rigidbody2D>().AddForce(dir * 10, ForceMode2D.Impulse);
     }
 }
