@@ -22,7 +22,7 @@ public class Gravit : MonoBehaviour
         gam_circle = GameObject.Find("redline");
         gam_circle.SetActive(false);
         dis_lose = gam_circle.GetComponent<SpriteRenderer>().bounds.extents.x;
-        dis_circle =dis_lose+ 0.6f;
+        dis_circle =dis_lose+ 0.5f;
         gam_circle.SetActive(false);
         Bounds bounds = GetComponent<SpriteRenderer>().bounds;
         outerBoundaryRadius = Mathf.Min(bounds.extents.x, bounds.extents.y);
