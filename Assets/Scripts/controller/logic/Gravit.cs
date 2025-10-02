@@ -27,7 +27,7 @@ public class Gravit : MonoBehaviour
         Bounds bounds = GetComponent<SpriteRenderer>().bounds;
         outerBoundaryRadius = Mathf.Min(bounds.extents.x, bounds.extents.y);
     }
-    void FixedUpdate()
+    void Update()
     {
         if (list_fruit.Count > 0)
         {
