@@ -50,16 +50,18 @@ public class Controller : MonoBehaviour
         return GetFruitData(op);
     }
     private GameObject watermelonPrefab;
-    public LineRenderer trajectoryLine;
     private GameObject gam_temp;
     private Vector2 startTouchPos;
     private Vector2 currentTouchPos;
     private bool isAiming = false;private Fruit_data cur_fruit;private Fruit_data next_fruit;
     private float gam_radios;
     [HideInInspector] public  float radios;
+    [Header("¿ØÖÆ²ÎÊý")]
+    private GameObject gam_whitelin;
     private void Start()
     {
-        trajectoryLine = GetComponent<LineRenderer>();
+        gam_whitelin = GameObject.Find("whiteline");
+        gam_whitelin.SetActive(false);
         Bounds bounds = GetComponent<SpriteRenderer>().bounds;
         radios = Mathf.Min(bounds.extents.x, bounds.extents.y);
         img_next = GameObject.Find("Canvas/Top/Next/img").GetComponent<Image>();
@@ -81,6 +83,7 @@ public class Controller : MonoBehaviour
 
     void Update()
     {
+        if (Gravit.Instance.game_end) return;
         if(gam_temp.activeSelf)
         HandleTouchInput();
         DrawTrajectory();
@@ -138,7 +141,7 @@ public class Controller : MonoBehaviour
     {
         isAiming = true;
         startTouchPos = screenPos;
-        trajectoryLine.enabled = true;
+        gam_whitelin.SetActive(true);
         Fruit_data op = GetFruitData((Fruittype)(Random.Range(0, dic_fruit.Count)));
     }
 
@@ -165,7 +168,7 @@ public class Controller : MonoBehaviour
         rb.AddForce(launchDirection * force * launchForce, ForceMode2D.Impulse);
         Gravit.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
         isAiming = false;
-        trajectoryLine.enabled = false;
+        gam_whitelin.SetActive(false);
         StartCoroutine(Create_fruit());
     }
     private IEnumerator Create_fruit()
@@ -182,10 +185,8 @@ public class Controller : MonoBehaviour
     void DrawTrajectory()
     {
         if (!isAiming) return;
-        Vector2 dir = (currentTouchPos - startTouchPos).normalized;
-        Vector2 pos = (Vector2)transform.position + dir * gam_radios;
-        trajectoryLine.SetPosition(0,new Vector3( pos.x,pos.y,-1));
-        dir *= radios;
-        trajectoryLine.SetPosition(1,new Vector3(dir.x,dir.y,-1));
+        Vector2 dir = currentTouchPos - startTouchPos;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        gam_whitelin.transform.eulerAngles=new Vector3(0, 0, angle);
     }
 }
