@@ -83,9 +83,13 @@ public class Controller : MonoBehaviour
 
     void Update()
     {
-        if (Gravit.Instance.game_end) return;
+        if (Gravit.Instance.game_end) { Debug.Log("”Œœ∑Ω· ¯"); return; };
         if(gam_temp.activeSelf)
         HandleTouchInput();
+        else
+        {
+            Debug.Log("gam ßªÓ");
+        }
         DrawTrajectory();
     }
 
