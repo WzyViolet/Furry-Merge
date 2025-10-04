@@ -20,10 +20,9 @@ public class Controller : MonoBehaviour
     [Header("游戏参数")]
     private List<Fruit_controller> list_cur = new List<Fruit_controller>();
     public float launchForce = 10f;        // 发射力度
-    public float outerCircleRadius = 5f;   // 外层圆半径
     public float gravityStrength = 2f;     // 重力强度
-
-    private Vector2 launchDirection;
+    public float range_dis;
+    private Vector2 launchDirection;private bool ariming;
     public Fruit_data GetFruitData(Fruittype type)
     {
         if (dic_fruit.ContainsKey(type))
@@ -60,7 +59,8 @@ public class Controller : MonoBehaviour
     private GameObject gam_whitelin;
     private void Start()
     {
-        gam_whitelin = GameObject.Find("whiteline");
+        gam_whitelin = GameObject.Find("whiteline");ariming = false;
+        range_dis = transform.Find("range").GetComponent<SpriteRenderer>().bounds.extents.x;
         gam_whitelin.SetActive(false);
         Bounds bounds = GetComponent<SpriteRenderer>().bounds;
         radios = Mathf.Min(bounds.extents.x, bounds.extents.y);
@@ -143,8 +143,8 @@ public class Controller : MonoBehaviour
     }
     void StartAiming(Vector2 screenPos)
     {
-        isAiming = true;
-        startTouchPos = screenPos;
+        isAiming = true;ariming = false;ariming = false;
+        startTouchPos=currentTouchPos = Camera.main.ScreenToWorldPoint(screenPos);
         gam_whitelin.SetActive(true);
         Fruit_data op = GetFruitData((Fruittype)(Random.Range(0, dic_fruit.Count)));
     }
@@ -152,15 +152,25 @@ public class Controller : MonoBehaviour
     void UpdateAiming(Vector2 screenPos)
     {
         if (!isAiming) return;
-
-        currentTouchPos = screenPos;
-        launchDirection = (currentTouchPos-startTouchPos).normalized;
+        ariming = true;Debug.Log("拖拽中");
+        currentTouchPos = Camera.main.ScreenToWorldPoint(screenPos);
+        if (Vector2.Distance(startTouchPos, currentTouchPos) < 0.1f)
+        {
+            startTouchPos = transform.position;
+        }
+        launchDirection = (currentTouchPos - startTouchPos).normalized;
     }
 
     void LaunchWatermelon()
     {
         if (!isAiming) return;
-
+        if(ariming==false)
+        {
+            startTouchPos = transform.position;
+            currentTouchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            launchDirection = (currentTouchPos - startTouchPos).normalized;
+            ariming = true;
+        }
         // 计算发射力度（基于滑动距离）
         float swipeDistance = Vector2.Distance(startTouchPos, currentTouchPos);
         float force = Mathf.Clamp(swipeDistance * 0.01f, 1f, 10f);
@@ -170,7 +180,8 @@ public class Controller : MonoBehaviour
         newMelon.GetComponent<Fruit_controller>().Initgam(new Fruit_curdata( cur_fruit));
         // 向外发射
         rb.AddForce(launchDirection * force * launchForce, ForceMode2D.Impulse);
-        Gravit.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
+        Debug.Log((launchDirection).magnitude);
+        Gravit.Instance.list_temp.Add(newMelon.GetComponent<Fruit_controller>());
         isAiming = false;
         gam_whitelin.SetActive(false);
         StartCoroutine(Create_fruit());
@@ -182,7 +193,7 @@ public class Controller : MonoBehaviour
         next_fruit = GetFruitData((Fruittype)Random.Range(1, 3));
         img_next.sprite = next_fruit.sprite;
         gam_temp.SetActive(true);
-        gam_temp.transform.localScale = (1 + cur_fruit.add_size*0.5f)*new Vector3(0.05f,0.05f,0.05f);
+        gam_temp.transform.localScale = (1 + cur_fruit.add_size*0.3f)*new Vector3(0.05f,0.05f,0.05f);
         gam_temp.GetComponent<SpriteRenderer>().sprite = cur_fruit.sprite;
         gam_radios = gam_temp.GetComponent<SpriteRenderer>().bounds.extents.x;
     }

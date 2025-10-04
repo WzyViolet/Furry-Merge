@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 871567434750320617}
   - component: {fileID: 3705167205928780267}
   - component: {fileID: 3023999032972778969}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,6 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mergeRadius: 0.5
+  shake: 0
   data:
     data:
       type: 0
@@ -169,6 +170,7 @@ MonoBehaviour:
       add_size: 0
       score: 0
       color: {r: 0, g: 0, b: 0, a: 0}
-  shake: 0
+  controller: {fileID: 0}
   timer: 0
+  can_test: 0
   dir: {x: 0, y: 0}

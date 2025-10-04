@@ -10,7 +10,7 @@ public class Fruit_controller : MonoBehaviour
     private Rigidbody2D rb;
     private bool isMerging = false;public  bool shake;
     public  Fruit_curdata data;public Controller controller;
-    private float radios;//°ë¾¶
+    public float radios;//°ë¾¶
     [HideInInspector] public float timer;
     [HideInInspector] public bool can_test=false;
     public float Get_radios { get { return radios; } }
@@ -36,18 +36,28 @@ public class Fruit_controller : MonoBehaviour
     }
     public void Do_scale(Fruit_curdata op,Fruit_curdata next)
     {
-        Initgam(op, next);
+        Initgam(op, next);float timer = 0;
         float scale = 1 + op.data.add_size * 0.3f;Vector3 temp= new Vector3(0.05f, 0.05f, 0.05f)*scale;
-        transform.DOScale(temp, 0.05f);
+        //transform.localScale = temp;
+        //transform.DOScale(temp, 0.05f);
         Vector2 dir = (transform.position - controller.transform.position).normalized;
-        rb.AddForce(dir * 5); GetComponent<SpriteRenderer>().sprite = op.data.sprite;
-        StartCoroutine(Wait_radius());
+        rb.AddForce(dir * 10,ForceMode2D.Impulse); GetComponent<SpriteRenderer>().sprite = op.data.sprite;
+        //StartCoroutine(Wait_radius());
+        while (true)
+        {
+            timer += Time.deltaTime;
+            transform.localScale = (timer / 0.1f) * temp;
+            if (timer >= 0.1f) break;
+        }
+        transform.localScale = temp;
+        Bounds bounds = GetComponent<SpriteRenderer>().bounds;
+        radios = bounds.extents.x;
     }
     private IEnumerator Wait_radius()
     {
-        yield return new WaitForSeconds(0.06f);
+        yield return null;
         Bounds bounds = GetComponent<SpriteRenderer>().bounds;
-        radios = Mathf.Min(bounds.extents.x, bounds.extents.y);
+        radios = bounds.extents.x;
 
     }
     void OnCollisionEnter2D(Collision2D collision)
@@ -100,9 +110,9 @@ public class Fruit_controller : MonoBehaviour
         Debug.Log("ÈÚºÏ");
         GameObject newMelon = Instantiate(gam, position, Quaternion.identity);
         Fruit_controller watermelon = newMelon.GetComponent<Fruit_controller>();
-        newMelon.GetComponent<Fruit_controller>().Do_scale(data,this.data);
-        Gravit.Instance.list_fruit.Add(newMelon.GetComponent<Fruit_controller>());
+        newMelon.GetComponent<Fruit_controller>().Do_scale(data,new Fruit_curdata(controller.GetFruitData(data.data.type)));
+        Gravit.Instance.list_temp.Add(newMelon.GetComponent<Fruit_controller>());
         Vector2 dir = (transform.position - controller.transform.position).normalized;
-        newMelon.GetComponent<Rigidbody2D>().AddForce(dir * 10, ForceMode2D.Impulse);
+        //newMelon.GetComponent<Rigidbody2D>().AddForce(dir*10, ForceMode2D.Impulse);
     }
 }

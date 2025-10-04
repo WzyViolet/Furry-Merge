@@ -12,23 +12,33 @@ public class Gravit : MonoBehaviour
         list_fruit = new List<Fruit_controller>();
     }
     private GameObject gam_circle;private float dis_circle, dis_lose;
-    public List<Fruit_controller> list_fruit;bool flash = false;
-    public float outerBoundaryRadius;private TextMeshProUGUI lose;
+    [HideInInspector]public List<Fruit_controller> list_temp;
+    [HideInInspector]public List<Fruit_controller> list_fruit;bool flash = false;
+    [HideInInspector]public float outerBoundaryRadius;private TextMeshProUGUI lose;
     [HideInInspector]public bool game_end;
     private void Start()
     {
+        list_temp = new List<Fruit_controller>();
         lose = GameObject.Find("Canvas_/lose").GetComponent<TextMeshProUGUI>();
         lose.gameObject.SetActive(false);
         gam_circle = GameObject.Find("redline");
         gam_circle.SetActive(false);
         dis_lose = gam_circle.GetComponent<SpriteRenderer>().bounds.extents.x;
-        dis_circle =dis_lose+ 0.5f;
+        dis_circle = dis_lose + 0.5f;
         gam_circle.SetActive(false);
-        Bounds bounds = GetComponent<SpriteRenderer>().bounds;
+        Bounds bounds = transform.GetChild(0).GetComponent<SpriteRenderer>().bounds;
         outerBoundaryRadius = Mathf.Min(bounds.extents.x, bounds.extents.y);
     }
     void Update()
     {
+        if (list_temp.Count > 0)
+        {
+            foreach(Fruit_controller temp in list_temp)
+            {
+                list_fruit.Add(temp);
+            }
+            list_temp.Clear();
+        }
         if (list_fruit.Count > 0)
         {
             flash = false;
